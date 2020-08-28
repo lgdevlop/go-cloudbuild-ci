@@ -1,0 +1,23 @@
+steps:
+
+- id: "Rodando teste unitário"
+  name: 'golang'
+  env:
+    - 'GOPATH=/workspace'
+  entrypoint: '/bin/sh'
+  args:
+    - '-c'
+    - |
+      mkdir -p src/github.com/lgdevlop/go-cloudbuild-ci/src;
+      cp app/app.go src/github.com/lgdevlop/go-cloudbuild-ci/src;
+      cp -r app/soma src/github.com/lgdevlop/go-cloudbuild-ci/src;
+      go test ./...
+
+- id: "Criando imagem do Dockerfile"
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/go-soma:$SHORT_SHA', '.']
+
+- id: "Subindo imagem"
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/go-soma:$SHORT_SHA']
+
